@@ -1,0 +1,8 @@
+.venv
+accounts/__pycache__
+accounts/migrations/__pycache__
+
+config/__pycache__
+
+.env
+db.sqlite3

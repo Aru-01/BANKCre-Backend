@@ -1,0 +1,87 @@
+from django.urls import path
+from accounts.views import (
+    SignupView,
+    VerifySignupOTPView,
+    ResendSignupOTPView,
+    LoginView,
+    ForgotPasswordView,
+    VerifyForgotPasswordOTPView,
+    ResendForgotPasswordOTPView,
+    ResetPasswordView,
+    ChangePasswordView,
+    TokenRefreshView,
+    LogoutView,
+    ProfileView,
+    SwitchRoleView,
+)
+
+app_name = "accounts"
+
+urlpatterns = [
+    path(
+        "signup/",
+        SignupView.as_view(),
+        name="signup",
+    ),
+    path(
+        "signup/verify/",
+        VerifySignupOTPView.as_view(),
+        name="verify-signup",
+    ),
+    path(
+        "signup/resend-otp/",
+        ResendSignupOTPView.as_view(),
+        name="resend-signup-otp",
+    ),
+    path(
+        "login/",
+        LoginView.as_view(),
+        name="login",
+    ),
+    path(
+        "password/forgot/",
+        ForgotPasswordView.as_view(),
+        name="forgot-password",
+    ),
+    path(
+        "password/forgot/verify/",
+        VerifyForgotPasswordOTPView.as_view(),
+        name="verify-forgot-password",
+    ),
+    path(
+        "password/forgot/resend/",
+        ResendForgotPasswordOTPView.as_view(),
+        name="resend-forgot-password",
+    ),
+    path(
+        "password/reset/",
+        ResetPasswordView.as_view(),
+        name="reset-password",
+    ),
+    path(
+        "password/change/",
+        ChangePasswordView.as_view(),
+        name="change-password",
+    ),
+    path(
+        "token/refresh/",
+        TokenRefreshView.as_view(),
+        name="token-refresh",
+    ),
+    path(
+        "logout/",
+        LogoutView.as_view(),
+        name="logout",
+    ),
+    path(
+        "profile/",
+        ProfileView.as_view(),
+        name="profile",
+    ),
+    path(
+        "role/",
+        SwitchRoleView.as_view(),
+        name="switch-role",
+    ),
+]
+
