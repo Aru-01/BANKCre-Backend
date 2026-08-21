@@ -56,7 +56,11 @@ class SignupView(APIView):
             return Response({"message": "Validation failed", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
         user = serializer.save()
-        create_otp(user.email, "signup")
+        try:
+            create_otp(user.email, "signup")
+        except ValueError as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
         return Response(
             {"message": "Account created successfully. Please verify your email.", "data": {"email": user.email}},
             status=status.HTTP_201_CREATED
@@ -110,7 +114,11 @@ class ResendSignupOTPView(APIView):
         if not user:
             return Response({"message": "User not found or already verified."}, status=status.HTTP_404_NOT_FOUND)
         
-        create_otp(email, "signup")
+        try:
+            create_otp(email, "signup")
+        except ValueError as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            
         return Response({"message": "A new OTP has been sent."}, status=status.HTTP_200_OK)
 
 
@@ -202,7 +210,10 @@ class ForgotPasswordView(APIView):
         email = serializer.validated_data["email"]
         user = CustomUser.objects.filter(email=email).first()
         if user:
-            create_otp(email, "forgot_password")
+            try:
+                create_otp(email, "forgot_password")
+            except ValueError as e:
+                return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
             
         return Response({"message": "If an account exists with this email, an OTP has been sent."}, status=status.HTTP_200_OK)
 
@@ -245,7 +256,10 @@ class ResendForgotPasswordOTPView(APIView):
 
         email = serializer.validated_data["email"]
         if CustomUser.objects.filter(email=email).exists():
-            create_otp(email, "forgot_password")
+            try:
+                create_otp(email, "forgot_password")
+            except ValueError as e:
+                return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
         return Response({"message": "If an account exists with this email, a new OTP has been sent."}, status=status.HTTP_200_OK)
 
@@ -363,6 +377,7 @@ class LogoutView(APIView):
 
 class ProfileView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def get_object(self):
         return self.request.user

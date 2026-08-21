@@ -1,151 +1,39 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BANCre</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-
-      body {
-        background-color: #0d0f14;
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        padding: 40px 16px;
-      }
-
-      .wrapper {
-        max-width: 580px;
-        margin: 0 auto;
-      }
-
-      /* ── Header ── */
-      .header {
-        background: linear-gradient(135deg, #0f1623 0%, #1a2236 100%);
-        border-radius: 16px 16px 0 0;
-        padding: 32px 40px;
-        text-align: center;
-        border-bottom: 1px solid rgba(99, 149, 255, 0.15);
-        position: relative;
-        overflow: hidden;
-      }
-
-      .header::before {
-        content: "";
-        position: absolute;
-        top: -60px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 240px;
-        height: 240px;
-        background: radial-gradient(
-          circle,
-          rgba(99, 149, 255, 0.12) 0%,
-          transparent 70%
-        );
-        pointer-events: none;
-      }
-
-      .logo-wrap {
-        display: inline-flex;
-        align-items: center;
-        gap: 10px;
-      }
-
-      .logo-icon {
-        width: 36px;
-        height: 36px;
-        background: linear-gradient(135deg, #6395ff, #a78bfa);
-        border-radius: 10px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 18px;
-        font-weight: 900;
-        color: #fff;
-        letter-spacing: -1px;
-      }
-
-      .logo-text {
-        font-size: 22px;
-        font-weight: 800;
-        color: #ffffff;
-        letter-spacing: 0.5px;
-      }
-
-      .logo-text span {
-        color: #6395ff;
-      }
-
-      /* ── Card Body ── */
-      .card {
-        background: #13181f;
-        padding: 44px 44px 36px;
-        border-left: 1px solid rgba(255, 255, 255, 0.05);
-        border-right: 1px solid rgba(255, 255, 255, 0.05);
-      }
-
-      /* ── Footer ── */
-      .footer {
-        background: #0f1623;
-        border-radius: 0 0 16px 16px;
-        padding: 24px 40px;
-        text-align: center;
-        border-top: 1px solid rgba(255, 255, 255, 0.06);
-      }
-
-      .footer p {
-        color: #4a5568;
-        font-size: 12px;
-        line-height: 1.7;
-      }
-
-      .footer a {
-        color: #6395ff;
-        text-decoration: none;
-      }
-
-      .footer-divider {
-        width: 40px;
-        height: 1px;
-        background: rgba(99, 149, 255, 0.3);
-        margin: 14px auto;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div class="wrapper">
-
-      <!-- Header -->
-      <div class="header">
-        <div class="logo-wrap">
-          <div class="logo-icon">B</div>
-          <div class="logo-text">BAN<span>Cre</span></div>
-        </div>
-      </div>
-
-      <!-- Body -->
-      <div class="card">
-        {% block content %}{% endblock %}
-      </div>
-
-      <!-- Footer -->
-      <div class="footer">
-        <p>© 2026 BANCre. All rights reserved.</p>
-        <div class="footer-divider"></div>
-        <p>
-          This is an automated message — please do not reply.<br />
-          If you have questions, contact
-          <a href="mailto:support@bancre.com">support@bancre.com</a>
-        </p>
-      </div>
-
-    </div>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BANCre</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f7f6; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <!-- 100% width background table -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f4f7f6; padding: 20px 10px;">
+    <tr>
+      <td align="center">
+        <!-- Main Email Container -->
+        <table width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 600px; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding: 30px 20px; background-color: #ffffff; border-bottom: 1px solid #edf2f7;">
+              <h1 style="margin: 0; color: #000000; font-size: 34px; font-family: 'Arial Black', Impact, sans-serif; font-weight: 900; letter-spacing: -2px; line-height: 1;">BANCre</h1>
+            </td>
+          </tr>
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 40px 30px; color: #4a5568; font-size: 16px; line-height: 1.6;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding: 24px 30px; background-color: #f8fafc; border-top: 1px solid #edf2f7; color: #718096; font-size: 13px;">
+              <p style="margin: 0 0 10px 0;">&copy; 2026 BANCre. All rights reserved.</p>
+              <p style="margin: 0;">This is an automated message &mdash; please do not reply.<br>If you have questions, contact <a href="mailto:support@bancre.com" style="color: #3182ce; text-decoration: none;">support@bancre.com</a></p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
 </html>

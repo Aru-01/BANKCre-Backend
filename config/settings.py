@@ -135,6 +135,8 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = f"BANCre <{EMAIL_HOST_USER}>"
 
+COMPANY_LOGO_URL = config("COMPANY_LOGO_URL", default="https://i.ibb.co.com/dw1P2S9K/BANCre.webp")
+
 # DRF & JWT Configuration
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
