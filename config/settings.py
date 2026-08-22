@@ -1,5 +1,6 @@
 from pathlib import Path
 from decouple import config
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -15,6 +16,7 @@ SECRET_KEY = "django-insecure-_7zs08^juy8+j92*2c)x+y!@5fe(z&cr!-hnx*@%3ab68v@_41
 DEBUG = True
 AUTH_USER_MODEL = "accounts.CustomUser"
 ALLOWED_HOSTS = ["*"]
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # Application definition
@@ -43,7 +45,7 @@ INSTALLED_APPS += [
 # =========================
 # Custom Apps
 # =========================
-INSTALLED_APPS += ["accounts"]
+INSTALLED_APPS += ["accounts", "properties"]
 
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
@@ -125,7 +127,28 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
+# =========================
+# Media files (uploads)
+# =========================
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
+# Allow large file uploads (50 MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
+# Write large files directly to disk instead of memory
+FILE_UPLOAD_HANDLERS = [
+    "django.core.files.uploadhandler.TemporaryFileUploadHandler",
+]
+
+
+# =========================
+# AI API Keys
+# =========================
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
+CLAUDE_API_KEY = config("CLAUDE_API_KEY", default="")
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
@@ -135,15 +158,21 @@ EMAIL_HOST_USER = config("EMAIL_HOST_USER", default="")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", default="")
 DEFAULT_FROM_EMAIL = f"BANCre <{EMAIL_HOST_USER}>"
 
-COMPANY_LOGO_URL = config("COMPANY_LOGO_URL", default="https://i.ibb.co.com/dw1P2S9K/BANCre.webp")
+COMPANY_LOGO_URL = config(
+    "COMPANY_LOGO_URL", default="https://i.ibb.co.com/dw1P2S9K/BANCre.webp"
+)
+
+from datetime import timedelta
 
 # DRF & JWT Configuration
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
 }
 
 SIMPLE_JWT = {
-    'AUTH_HEADER_TYPES': ('Bearer',),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }

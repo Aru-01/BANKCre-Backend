@@ -99,6 +99,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         return self.email
 
     def has_role(self, role):
+        if self.is_superuser:
+            return True
         return self.roles.filter(name=role).exists()
 
     def get_roles(self):

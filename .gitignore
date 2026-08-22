@@ -1,8 +1,15 @@
 .venv
 accounts/__pycache__
 accounts/migrations/__pycache__
+properties/__pycache__
+properties/migrations/__pycache__
+
+media
+properties/chatbot/__pycache__
 
 config/__pycache__
 
 .env
 db.sqlite3
+
+properties_old
