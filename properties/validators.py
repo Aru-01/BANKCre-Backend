@@ -1,31 +1,32 @@
 import os
 
-# ─────────────────────────────────────────────
 # File constraints
-# ─────────────────────────────────────────────
-
-MAX_DOC_SIZE_MB    = 25
+MAX_DOC_SIZE_MB = 25
 MAX_DOC_SIZE_BYTES = MAX_DOC_SIZE_MB * 1024 * 1024
 
-MAX_IMG_SIZE_MB    = 10
+MAX_IMG_SIZE_MB = 10
 MAX_IMG_SIZE_BYTES = MAX_IMG_SIZE_MB * 1024 * 1024
 
-ALLOWED_IMAGE_EXTENSIONS = {'png', 'jpg', 'jpeg', 'webp', 'gif'}
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "webp", "gif"}
 
 ALLOWED_DOCUMENT_EXTENSIONS = {
-    'pdf',
-    'png', 'jpg', 'jpeg', 'webp',
-    'xlsx', 'xls', 'csv',
-    'pptx', 'ppt',
-    'docx', 'doc',
-    'txt',
+    "pdf",
+    "png",
+    "jpg",
+    "jpeg",
+    "webp",
+    "xlsx",
+    "xls",
+    "csv",
+    "pptx",
+    "ppt",
+    "docx",
+    "doc",
+    "txt",
 }
 
 
-# ─────────────────────────────────────────────
 # Single-file validators
-# ─────────────────────────────────────────────
-
 def validate_image_file(file):
     """
     Validate a single image file for size and extension.
@@ -37,7 +38,7 @@ def validate_image_file(file):
             f"'{file.name}' exceeds the maximum allowed size of {MAX_IMG_SIZE_MB} MB "
             f"(uploaded: {size_mb:.2f} MB)."
         )
-    ext = os.path.splitext(file.name)[1].lstrip('.').lower()
+    ext = os.path.splitext(file.name)[1].lstrip(".").lower()
     if ext not in ALLOWED_IMAGE_EXTENSIONS:
         return False, (
             f"'{file.name}' has an unsupported image type (.{ext}). "
@@ -57,7 +58,7 @@ def validate_document_file(file):
             f"'{file.name}' exceeds the maximum allowed size of {MAX_DOC_SIZE_MB} MB "
             f"(uploaded: {size_mb:.2f} MB)."
         )
-    ext = os.path.splitext(file.name)[1].lstrip('.').lower()
+    ext = os.path.splitext(file.name)[1].lstrip(".").lower()
     if ext not in ALLOWED_DOCUMENT_EXTENSIONS:
         return False, (
             f"'{file.name}' has an unsupported file type (.{ext}). "
@@ -66,10 +67,7 @@ def validate_document_file(file):
     return True, None
 
 
-# ─────────────────────────────────────────────
 # Batch validators
-# ─────────────────────────────────────────────
-
 def validate_images(files):
     """Validate a list of image files. Returns (valid_files, errors)."""
     valid_files, errors = [], []

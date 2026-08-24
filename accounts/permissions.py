@@ -11,7 +11,10 @@ class IsLender(BasePermission):
             return False
         if request.user.is_superuser:
             return True
-        return request.user.roles.filter(name=Role.LENDER).exists()
+            
+        if not hasattr(request.user, '_is_lender_cache'):
+            request.user._is_lender_cache = request.user.roles.filter(name=Role.LENDER).exists()
+        return request.user._is_lender_cache
 
 
 class IsSponsor(BasePermission):
@@ -22,4 +25,7 @@ class IsSponsor(BasePermission):
             return False
         if request.user.is_superuser:
             return True
-        return request.user.roles.filter(name=Role.SPONSOR).exists()
+            
+        if not hasattr(request.user, '_is_sponsor_cache'):
+            request.user._is_sponsor_cache = request.user.roles.filter(name=Role.SPONSOR).exists()
+        return request.user._is_sponsor_cache

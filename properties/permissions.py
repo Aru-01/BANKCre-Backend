@@ -1,6 +1,5 @@
 from rest_framework.permissions import BasePermission
-from accounts.permissions import IsSponsor, IsLender  # reuse from accounts
-
+from accounts.permissions import IsSponsor, IsLender  
 
 __all__ = ['IsSponsor', 'IsLender', 'IsPropertyOwner']
 

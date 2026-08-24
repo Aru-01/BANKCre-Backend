@@ -1,11 +1,10 @@
 .venv
-accounts/__pycache__
-accounts/migrations/__pycache__
-properties/__pycache__
-properties/migrations/__pycache__
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
 
 media
-properties/chatbot/__pycache__
 
 config/__pycache__
 
