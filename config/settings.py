@@ -18,6 +18,9 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 ALLOWED_HOSTS = ["*"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# API Keys
+CLAUDE_API_KEY = config("CLAUDE_API_KEY", default="")
+OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
 
 # Application definition
 
@@ -41,6 +44,7 @@ INSTALLED_APPS += [
     "debug_toolbar",
     "corsheaders",
     "drf_yasg",
+    "django_celery_results",
 ]
 # =========================
 # Custom Apps

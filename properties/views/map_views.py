@@ -72,7 +72,10 @@ class PlaceView(APIView):
 
         data = serializer.validated_data
         extracted = extract_property_details(
-            data.get("name", ""), data.get("address", "")
+            data.get("name", ""), 
+            data.get("address", ""),
+            lat=data.get("lat"),
+            lng=data.get("lng")
         )
 
         # Merge extracted details

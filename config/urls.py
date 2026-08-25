@@ -21,6 +21,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("auth/", include("accounts.urls")),
     path("api/v1/properties/", include("properties.urls", namespace="properties")),
+    path("api/v1/memorandums/", include("memorandums.urls", namespace="memorandums")),
     # path("api-auth/", include("rest_framework.urls")),
     path(
         "docs/",

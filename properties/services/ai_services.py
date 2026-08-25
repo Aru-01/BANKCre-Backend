@@ -5,45 +5,54 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
-def extract_property_details(name, address):
+def extract_property_details(name, address, lat=None, lng=None):
     try:
-        from openai import OpenAI
+        import anthropic
     except ImportError:
         return {}
     
-    api_key = getattr(settings, 'OPENAI_API_KEY', '') or os.getenv('OPENAI_API_KEY', '')
+    api_key = getattr(settings, 'CLAUDE_API_KEY', '') or os.getenv('CLAUDE_API_KEY', '')
     if not api_key:
         return {}
         
-    client = OpenAI(api_key=api_key)
+    client = anthropic.Anthropic(api_key=api_key)
+    
+    location_str = f"Property Name: {name}\nProperty Address: {address}"
+    if lat and lng:
+        location_str += f"\nLatitude: {lat}\nLongitude: {lng}"
+        
     prompt = f"""
-Given the following property name and address, please estimate or extract the following details. If you are unsure or cannot find the data, return null or 0. Return ONLY a valid JSON object with these exact keys:
-- property_type (MUST be one of exactly: "multifamily", "retail", "industrial", "office", "other", or null)
-- number_of_units (integer or null)
-- rentable_area (float or null)
-- year_built (integer or null)
-- occupancy_rate (float or null)
+Given the following property details, please extract or estimate the property metrics. 
+To ensure maximum accuracy, first use your internal knowledge to recall specific facts about this property (e.g., exact opening year, exact number of rooms, total area) in a brief reasoning step.
+If this is a known property or hotel, do NOT return null if you can make a highly educated estimate. 
+Return ONLY a valid JSON object with these exact keys:
+- _reasoning (string: write a short 1-2 sentence factual recall about the property to ensure accuracy)
+- property_type (MUST be one of exactly: "multifamily", "retail", "industrial", "office", "other", or null. For a hotel, use "other".)
+- number_of_units (integer or null. For a hotel, this is the exact number of rooms.)
+- rentable_area (float or null. Total square footage approx.)
+- year_built (integer or null. The exact year it opened/was built.)
+- occupancy_rate (float or null. e.g., 0.75 for 75%)
 - year_renovated (integer or null)
 - parking_spaces (integer or null)
 
-Property Name: {name}
-Property Address: {address}
+{location_str}
 """
     try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            temperature=0.0,
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=500,
+            system="You are a helpful assistant that strictly returns valid JSON with no markdown formatting.",
             messages=[
-                {"role": "system", "content": "You are a helpful assistant that strictly returns valid JSON."},
                 {"role": "user", "content": prompt}
-            ]
+            ],
+            extra_body={"temperature": 0.0}
         )
-        text = response.choices[0].message.content
+        text = response.content[0].text.strip()
         start_idx = text.find('{')
         end_idx = text.rfind('}')
         if start_idx != -1 and end_idx != -1:
             json_str = text[start_idx:end_idx+1]
             return json.loads(json_str)
     except Exception as e:
-        logger.warning(f"OpenAI extraction failed: {e}")
+        logger.warning(f"Claude extraction failed: {e}")
     return {}
