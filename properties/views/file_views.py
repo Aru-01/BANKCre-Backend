@@ -15,7 +15,6 @@ from properties.models import Property, PropertyFile
 from properties.serializers import PropertyFileSerializer
 from properties.permissions import IsSponsor
 from properties.validators import validate_documents, validate_images
-from properties.chatbot import ingest_file
 from properties.views.property_views import _get_sponsor_role
 from properties.views.schemas import success_schema, error_schema
 
@@ -181,12 +180,10 @@ class PropertyFileViewSet(
             )
             ids.append(pf.id)
 
-        # Auto-ingest documents
+        # Auto-ingest documents via Celery Task
+        from properties.tasks import ingest_file_task
         for file_id in ids:
-            try:
-                ingest_file(file_id)
-            except Exception as exc:
-                logger.warning("ingest_file failed for file %s: %s", file_id, exc)
+            ingest_file_task.delay(file_id)
 
         saved_qs = PropertyFile.objects.filter(pk__in=ids).select_related(
             "uploaded_by", "uploaded_by_role"

@@ -23,7 +23,7 @@ urlpatterns = [
     path("api/v1/properties/", include("properties.urls", namespace="properties")),
     # path("api-auth/", include("rest_framework.urls")),
     path(
-        "swagger/",
+        "docs/",
         schema_view.with_ui("swagger", cache_timeout=0),
         name="schema-swagger-ui",
     ),

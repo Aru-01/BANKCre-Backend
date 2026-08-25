@@ -12,3 +12,5 @@ config/__pycache__
 db.sqlite3
 
 properties_old
+memorandums_old
+Project_run_command.md

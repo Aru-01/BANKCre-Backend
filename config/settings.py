@@ -45,7 +45,7 @@ INSTALLED_APPS += [
 # =========================
 # Custom Apps
 # =========================
-INSTALLED_APPS += ["accounts", "properties"]
+INSTALLED_APPS += ["accounts", "properties", "memorandums"]
 
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
@@ -136,8 +136,8 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Allow large file uploads (50 MB)
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
-FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800   # 50 MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 # Write large files directly to disk instead of memory
 FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
@@ -161,6 +161,15 @@ DEFAULT_FROM_EMAIL = f"BANCre <{EMAIL_HOST_USER}>"
 COMPANY_LOGO_URL = config(
     "COMPANY_LOGO_URL", default="https://i.ibb.co.com/dw1P2S9K/BANCre.webp"
 )
+
+# Celery Configuration Options
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = TIME_ZONE
+
 
 from datetime import timedelta
 

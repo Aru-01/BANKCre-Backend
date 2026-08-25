@@ -13,7 +13,6 @@ from properties.models import Property, PropertyFile
 from properties.serializers import PropertySerializer, PropertyListSerializer
 from properties.permissions import IsSponsor
 from properties.validators import validate_images
-from properties.services.file_services import download_images_from_urls
 from properties.views.schemas import success_schema, error_schema
 
 logger = logging.getLogger(__name__)
@@ -134,19 +133,13 @@ class PropertyViewSet(ModelViewSet):
                 photo_urls = [url.strip() for url in val.split(",")]
 
         if photo_urls:
-            downloaded = download_images_from_urls(photo_urls)
-            for filename, content in downloaded:
-                ext = os.path.splitext(filename)[1].lstrip(".").lower()
-                PropertyFile.objects.create(
-                    property=prop,
-                    file=content,
-                    category=PropertyFile.CATEGORY_IMAGE,
-                    file_name=filename,
-                    file_type=ext,
-                    image_source=PropertyFile.SOURCE_MAP,  # Mark it as coming from the map
-                    uploaded_by=request.user,
-                    uploaded_by_role=sponsor_role,
-                )
+            from properties.tasks import download_map_images_task
+            download_map_images_task.delay(
+                photo_urls=photo_urls,
+                property_id=prop.id,
+                user_id=request.user.id,
+                role_id=sponsor_role.id
+            )
 
         # Refresh serializer with the images attached
         serializer = self.get_serializer(prop, context={"request": request})
