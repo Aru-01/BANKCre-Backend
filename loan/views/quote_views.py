@@ -299,10 +299,16 @@ class AcceptQuoteView(APIView):
             quote.status = LoanQuote.STATUS_ACCEPTED
             quote.save(update_fields=["status", "updated_at"])
 
-            # Decline all other quotes on the same request
-            LoanQuote.objects.filter(loan_request=loan_request).exclude(
-                pk=quote.pk
-            ).update(status=LoanQuote.STATUS_DECLINED)
+            # Decline all other quotes on the same request and trigger decline notifications
+            other_quotes = list(
+                LoanQuote.objects.filter(loan_request=loan_request)
+                .exclude(pk=quote.pk)
+                .select_related("loan_request__property", "lender")
+            )
+            for other_quote in other_quotes:
+                if other_quote.status != LoanQuote.STATUS_DECLINED:
+                    other_quote.status = LoanQuote.STATUS_DECLINED
+                    other_quote.save(update_fields=["status", "updated_at"])
 
             # Close loan request
             loan_request.status = LoanRequest.STATUS_CLOSED
