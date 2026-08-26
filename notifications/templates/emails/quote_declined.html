@@ -1,0 +1,18 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<div style="text-align: left;">
+  <!-- Badge -->
+  <span style="display: inline-block; padding: 4px 12px; background-color: #fef2f2; color: #dc2626; font-size: 12px; font-weight: bold; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Quote Update</span>
+  
+  <h2 style="margin: 0 0 15px 0; color: #1a202c; font-size: 24px;">Loan Quote Status Update</h2>
+  
+  <p style="margin: 0 0 25px 0; color: #4a5568;">Hello <strong>{{ lender_name }}</strong>,<br>Thank you for participating and submitting your quote for <strong>{{ property_name }}</strong>. The sponsor has chosen to decline this quote or proceed with another financing option.</p>
+  
+  <p style="margin: 0 0 25px 0; color: #4a5568;">There are new commercial real estate opportunities listed daily. Visit the BANCre marketplace to discover active loan requests matching your lending criteria.</p>
+  
+  <!-- Footer Note -->
+  <div style="border-top: 1px solid #edf2f7; padding-top: 20px;">
+    <p style="margin: 0; font-size: 13px; color: #a0aec0;">You received this email because quote notifications are enabled in your BANCre account settings.</p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<div style="text-align: left;">
+  <!-- Badge -->
+  <span style="display: inline-block; padding: 4px 12px; background-color: #ebf8ff; color: #3182ce; font-size: 12px; font-weight: bold; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Quote Received</span>
+  
+  <h2 style="margin: 0 0 15px 0; color: #1a202c; font-size: 24px;">New Loan Quote Received</h2>
+  
+  <p style="margin: 0 0 25px 0; color: #4a5568;">Hello <strong>{{ sponsor_name }}</strong>,<br>A new loan quote has been submitted by <strong>{{ lender_name }}</strong> for your loan request on <strong>{{ property_name }}</strong>.</p>
+  
+  <!-- Summary Box -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 25px;">
+    <tr>
+      <td style="padding: 20px;">
+        <table width="100%" cellpadding="6" cellspacing="0" border="0" style="font-size: 14px;">
+          <tr>
+            <td style="color: #718096; width: 40%;">Property:</td>
+            <td style="color: #1a202c; font-weight: bold;">{{ property_name }}</td>
+          </tr>
+          <tr>
+            <td style="color: #718096;">Lender:</td>
+            <td style="color: #1a202c; font-weight: bold;">{{ lender_name }}</td>
+          </tr>
+          <tr>
+            <td style="color: #718096;">Loan Amount:</td>
+            <td style="color: #2b6cb0; font-weight: bold; font-size: 16px;">${{ loan_amount }}</td>
+          </tr>
+          <tr>
+            <td style="color: #718096;">Interest Rate:</td>
+            <td style="color: #1a202c; font-weight: bold;">{{ interest_rate }}%</td>
+          </tr>
+          <tr>
+            <td style="color: #718096;">Term:</td>
+            <td style="color: #1a202c; font-weight: bold;">{{ term }} months</td>
+          </tr>
+          {% if dscr %}
+          <tr>
+            <td style="color: #718096;">Estimated DSCR:</td>
+            <td style="color: #1a202c; font-weight: bold;">{{ dscr }}</td>
+          </tr>
+          {% endif %}
+        </table>
+      </td>
+    </tr>
+  </table>
+  
+  <p style="margin: 0 0 25px 0; color: #4a5568;">Log in to your <strong>BANCre</strong> dashboard to review full loan terms, compare with other quotes, and accept this offer.</p>
+  
+  <!-- Footer Note -->
+  <div style="border-top: 1px solid #edf2f7; padding-top: 20px;">
+    <p style="margin: 0; font-size: 13px; color: #a0aec0;">You received this email because quote notifications are enabled in your BANCre account settings.</p>
+  </div>
+</div>
+{% endblock %}

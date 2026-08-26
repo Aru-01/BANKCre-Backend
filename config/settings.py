@@ -1,13 +1,9 @@
 from pathlib import Path
 from decouple import config
 import os
+from datetime import timedelta
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = "django-insecure-_7zs08^juy8+j92*2c)x+y!@5fe(z&cr!-hnx*@%3ab68v@_41"
@@ -18,9 +14,6 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 ALLOWED_HOSTS = ["*"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# API Keys
-CLAUDE_API_KEY = config("CLAUDE_API_KEY", default="")
-OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
 
 # Application definition
 
@@ -34,9 +27,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 ]
 
-# =========================
 # Third-Party Apps
-# =========================
 INSTALLED_APPS += [
     "rest_framework",
     "rest_framework_simplejwt",
@@ -46,10 +37,16 @@ INSTALLED_APPS += [
     "drf_yasg",
     "django_celery_results",
 ]
-# =========================
+
 # Custom Apps
-# =========================
-INSTALLED_APPS += ["accounts", "properties", "memorandums", "chatbot"]
+INSTALLED_APPS += [
+    "accounts",
+    "properties",
+    "memorandums",
+    "chatbot",
+    "loan",
+    "notifications",
+]
 
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
@@ -85,9 +82,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-# Database
-# https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
@@ -95,9 +89,6 @@ DATABASES = {
     }
 }
 
-
-# Password validation
-# https://docs.djangoproject.com/en/6.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -115,9 +106,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/6.1/topics/i18n/
-
 LANGUAGE_CODE = "en-us"
 
 TIME_ZONE = "UTC"
@@ -133,26 +121,23 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# =========================
 # Media files (uploads)
-# =========================
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Allow large file uploads (50 MB)
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 MB
-# Write large files directly to disk instead of memory
 FILE_UPLOAD_HANDLERS = [
     "django.core.files.uploadhandler.TemporaryFileUploadHandler",
 ]
 
 
-# =========================
 # AI API Keys
 # =========================
 OPENAI_API_KEY = config("OPENAI_API_KEY", default="")
 CLAUDE_API_KEY = config("CLAUDE_API_KEY", default="")
+
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = config("EMAIL_HOST", default="smtp.gmail.com")
@@ -174,8 +159,6 @@ CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
 
-
-from datetime import timedelta
 
 # DRF & JWT Configuration
 REST_FRAMEWORK = {

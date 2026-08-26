@@ -23,6 +23,11 @@ urlpatterns = [
     path("api/v1/properties/", include("properties.urls", namespace="properties")),
     path("api/v1/memorandums/", include("memorandums.urls", namespace="memorandums")),
     path("api/v1/chatbot/", include("chatbot.urls", namespace="chatbot")),
+    path("api/v1/loans/", include("loan.urls", namespace="loan")),
+    path(
+        "api/v1/notifications/",
+        include("notifications.urls", namespace="notifications"),
+    ),
     # path("api-auth/", include("rest_framework.urls")),
     path(
         "docs/",

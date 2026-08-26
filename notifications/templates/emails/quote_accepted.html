@@ -1,0 +1,44 @@
+{% extends "emails/base.html" %}
+{% block content %}
+<div style="text-align: left;">
+  <!-- Badge -->
+  <span style="display: inline-block; padding: 4px 12px; background-color: #f0fdf4; color: #16a34a; font-size: 12px; font-weight: bold; border-radius: 20px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;">Quote Accepted</span>
+  
+  <h2 style="margin: 0 0 15px 0; color: #1a202c; font-size: 24px;">Congratulations! Your Quote Has Been Accepted</h2>
+  
+  <p style="margin: 0 0 25px 0; color: #4a5568;">Hello <strong>{{ lender_name }}</strong>,<br>Great news! Your loan quote for <strong>{{ property_name }}</strong> has been officially accepted by the sponsor.</p>
+  
+  <!-- Summary Box -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; margin-bottom: 25px;">
+    <tr>
+      <td style="padding: 20px;">
+        <table width="100%" cellpadding="6" cellspacing="0" border="0" style="font-size: 14px;">
+          <tr>
+            <td style="color: #4b5563; width: 40%;">Property:</td>
+            <td style="color: #111827; font-weight: bold;">{{ property_name }}</td>
+          </tr>
+          <tr>
+            <td style="color: #4b5563;">Accepted Loan Amount:</td>
+            <td style="color: #16a34a; font-weight: bold; font-size: 16px;">${{ loan_amount }}</td>
+          </tr>
+          <tr>
+            <td style="color: #4b5563;">Interest Rate:</td>
+            <td style="color: #111827; font-weight: bold;">{{ interest_rate }}%</td>
+          </tr>
+          <tr>
+            <td style="color: #4b5563;">Term:</td>
+            <td style="color: #111827; font-weight: bold;">{{ term }} months</td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  
+  <p style="margin: 0 0 25px 0; color: #4a5568;">Please log in to your <strong>BANCre</strong> account to access the sponsor's contact details and proceed with the loan closing process.</p>
+  
+  <!-- Footer Note -->
+  <div style="border-top: 1px solid #edf2f7; padding-top: 20px;">
+    <p style="margin: 0; font-size: 13px; color: #a0aec0;">You received this email because quote notifications are enabled in your BANCre account settings.</p>
+  </div>
+</div>
+{% endblock %}
