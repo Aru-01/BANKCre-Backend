@@ -93,23 +93,17 @@ class ChatbotAPITests(APITestCase):
             conversation=conv1, role="assistant", content="Hi there!"
         )
 
-        # User 1 can view via /messages/
+        # User 1 can view via detail URL /<id>/
         self.client.force_authenticate(user=self.user1)
-        url_messages = f"/api/v1/chatbot/conversations/{conv1.id}/messages/"
-        response = self.client.get(url_messages)
+        url_detail = f"/api/v1/chatbot/conversations/{conv1.id}/"
+        response = self.client.get(url_detail)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.data["data"]), 2)
 
-        # User 1 can also view via detail URL /<id>/
-        url_detail = f"/api/v1/chatbot/conversations/{conv1.id}/"
-        response_detail = self.client.get(url_detail)
-        self.assertEqual(response_detail.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response_detail.data["data"]), 2)
-
         # User 2 gets 403 Forbidden
         self.client.force_authenticate(user=self.user2)
-        response = self.client.get(url_messages)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
+        response_forbidden = self.client.get(url_detail)
+        self.assertEqual(response_forbidden.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_delete_conversation(self):
         conv1 = Conversation.objects.create(user=self.user1, title="User1 Chat")

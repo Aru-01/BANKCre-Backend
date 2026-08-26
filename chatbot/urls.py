@@ -15,9 +15,4 @@ urlpatterns = [
         ConversationDetailView.as_view(),
         name="conversation-detail",
     ),
-    path(
-        "conversations/<int:pk>/messages/",
-        ConversationDetailView.as_view(),
-        name="conversation-messages",
-    ),
 ]

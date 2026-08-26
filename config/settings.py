@@ -49,7 +49,7 @@ INSTALLED_APPS += [
 # =========================
 # Custom Apps
 # =========================
-INSTALLED_APPS += ["accounts", "properties", "memorandums"]
+INSTALLED_APPS += ["accounts", "properties", "memorandums", "chatbot"]
 
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",

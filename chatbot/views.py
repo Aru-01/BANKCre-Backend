@@ -221,15 +221,15 @@ class ConversationListView(APIView):
 
 class ConversationDetailView(APIView):
     """
-    GET    /api/v1/chatbot/conversations/<pk>/messages/  — Retrieve message history
-    DELETE /api/v1/chatbot/conversations/<pk>/           — Delete conversation
+    GET    /api/v1/chatbot/conversations/<pk>/  — Retrieve conversation message history
+    DELETE /api/v1/chatbot/conversations/<pk>/  — Delete conversation
     """
 
     permission_classes = [IsAuthenticated]
 
     @swagger_auto_schema(
-        operation_summary="Get conversation message history",
-        operation_description="Retrieve all chronological messages for a specific conversation.",
+        operation_summary="Get conversation details and messages",
+        operation_description="Retrieve all chronological messages for a specific conversation thread.",
         tags=["Chatbot"],
         manual_parameters=[
             openapi.Parameter(
