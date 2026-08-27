@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.views import APIView
 from rest_framework.generics import RetrieveUpdateAPIView
 from rest_framework.response import Response
@@ -531,7 +531,7 @@ class LogoutView(APIView):
 
 class ProfileView(RetrieveUpdateAPIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get_object(self):
         return self.request.user
@@ -571,7 +571,7 @@ class ProfileView(RetrieveUpdateAPIView):
 class MediaFileViewSet(ModelViewSet):
     serializer_class = sz.MediaFileSerializer
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def get_queryset(self):
         return MediaFile.objects.filter(user=self.request.user).select_related("role")

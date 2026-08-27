@@ -1,14 +1,5 @@
 from rest_framework.permissions import BasePermission
-from accounts.models import Role
-
-
-class IsSponsor(BasePermission):
-    """Allow access only to authenticated users who have the Sponsor role."""
-
-    def has_permission(self, request, view):
-        if not request.user or not request.user.is_authenticated:
-            return False
-        return request.user.is_superuser or request.user.has_role(Role.SPONSOR)
+from accounts.permissions import IsSponsor, IsSponsorOrLender
 
 
 class IsMemorandumOwner(BasePermission):

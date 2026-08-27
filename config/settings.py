@@ -6,12 +6,33 @@ from datetime import timedelta
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-_7zs08^juy8+j92*2c)x+y!@5fe(z&cr!-hnx*@%3ab68v@_41"
+SECRET_KEY = config(
+    "SECRET_KEY",
+    default="django-insecure-_7zs08^juy8+j92*2c)x+y!@5fe(z&cr!-hnx*@%3ab68v@_41",
+)
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config("DEBUG", default=True, cast=bool)
 AUTH_USER_MODEL = "accounts.CustomUser"
-ALLOWED_HOSTS = ["*"]
+
+_allowed_hosts_env = config("ALLOWED_HOSTS", default="*")
+ALLOWED_HOSTS = [host.strip() for host in _allowed_hosts_env.split(",") if host.strip()]
+if "*" in ALLOWED_HOSTS or DEBUG:
+    default_dev_hosts = [
+        "testserver",
+        "localhost",
+        "127.0.0.1",
+        "0.0.0.0",
+        ".ngrok-free.app",
+        ".ngrok-free.dev",
+        ".ngrok.app",
+        ".ngrok.dev",
+        ".ngrok.io",
+        ".loca.lt",
+    ]
+    for h in default_dev_hosts:
+        if h not in ALLOWED_HOSTS:
+            ALLOWED_HOSTS.append(h)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
@@ -82,12 +103,33 @@ TEMPLATES = [
 WSGI_APPLICATION = "config.wsgi.application"
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+# Database Configuration (PostgreSQL with SQLite fallback)
+# =========================
+DB_NAME = config("DB_NAME", default="")
+DB_USER = config("DB_USER", default="")
+DB_PASSWORD = config("DB_PASSWORD", default="")
+DB_HOST = config("DB_HOST", default="localhost")
+DB_PORT = config("DB_PORT", default="5432")
+DB_ENGINE = config("DB_ENGINE", default="django.db.backends.postgresql")
+
+if DB_NAME:
+    DATABASES = {
+        "default": {
+            "ENGINE": DB_ENGINE,
+            "NAME": DB_NAME,
+            "USER": DB_USER,
+            "PASSWORD": DB_PASSWORD,
+            "HOST": DB_HOST,
+            "PORT": DB_PORT,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
+    }
 
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -172,3 +214,68 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+
+
+# CORS Configuration
+# =========================
+CORS_ALLOW_ALL_ORIGINS = config("CORS_ALLOW_ALL_ORIGINS", default=False, cast=bool)
+
+# Specific allowed origins (loaded from .env as comma-separated strings)
+_default_cors_origins = (
+    "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "http://localhost:8000,http://127.0.0.1:8000"
+)
+_cors_origins_env = config("CORS_ALLOWED_ORIGINS", default=_default_cors_origins)
+CORS_ALLOWED_ORIGINS = [
+    origin.strip() for origin in _cors_origins_env.split(",") if origin.strip()
+]
+
+# Regex pattern support for dynamic domains (e.g. ngrok, localtunnel, preview environments)
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https?:\/\/.*\.ngrok-free\.app$",
+    r"^https?:\/\/.*\.ngrok-free\.dev$",
+    r"^https?:\/\/.*\.ngrok\.app$",
+    r"^https?:\/\/.*\.ngrok\.dev$",
+    r"^https?:\/\/.*\.ngrok\.io$",
+    r"^https?:\/\/.*\.loca\.lt$",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+
+# CSRF Trusted Origins (needed for POST/PATCH across domains, ngrok, and frontend apps)
+# =========================
+_default_csrf_origins = (
+    "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:5173,http://127.0.0.1:5173,"
+    "http://localhost:8000,http://127.0.0.1:8000,"
+    "https://*.ngrok-free.app,https://*.ngrok-free.dev,https://*.ngrok.app,https://*.ngrok.dev,https://*.ngrok.io,https://*.loca.lt,"
+    "http://*.ngrok-free.app,http://*.ngrok-free.dev,http://*.ngrok.app,http://*.ngrok.dev,http://*.ngrok.io,http://*.loca.lt"
+)
+_csrf_origins_env = config("CSRF_TRUSTED_ORIGINS", default=_default_csrf_origins)
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip() for origin in _csrf_origins_env.split(",") if origin.strip()
+]
+

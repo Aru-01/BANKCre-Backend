@@ -101,7 +101,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def has_role(self, role):
         if self.is_superuser:
             return True
-        return self.roles.filter(name=role).exists()
+        if getattr(self, "active_role", None) == role:
+            return True
+        cache_attr = f"_has_role_{role}"
+        if not hasattr(self, cache_attr):
+            setattr(self, cache_attr, self.roles.filter(name=role).exists())
+        return getattr(self, cache_attr)
 
     def get_roles(self):
         return list(self.roles.values_list("name", flat=True))

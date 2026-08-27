@@ -6,6 +6,7 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 from rest_framework import permissions
+from config.views import root_welcome_view, health_check_view
 
 schema_view = get_schema_view(
     openapi.Info(
@@ -18,6 +19,9 @@ schema_view = get_schema_view(
     permission_classes=(permissions.AllowAny,),
 )
 urlpatterns = [
+    path("", root_welcome_view, name="root-welcome"),
+    path("health/", health_check_view, name="health-check"),
+    path("api/v1/health/", health_check_view, name="api-health-check"),
     path("admin/", admin.site.urls),
     path("auth/", include("accounts.urls")),
     path("api/v1/properties/", include("properties.urls", namespace="properties")),

@@ -100,11 +100,18 @@ class MemorandumDetailSerializer(serializers.ModelSerializer):
 
 
 class MemorandumUpdateSerializer(serializers.ModelSerializer):
-    """For PATCH: only title and mode are editable."""
+    """For PATCH: title, mode, and status (e.g. Draft -> Published) are editable."""
 
     class Meta:
         model = Memorandum
-        fields = ["title", "mode"]
+        fields = ["title", "mode", "status"]
+
+    def validate_status(self, value):
+        if value not in [Memorandum.STATUS_DRAFT, Memorandum.STATUS_PUBLISHED]:
+            raise serializers.ValidationError(
+                f"Status can only be set to '{Memorandum.STATUS_DRAFT}' or '{Memorandum.STATUS_PUBLISHED}'."
+            )
+        return value
 
 
 class GenerateMemorandumSerializer(serializers.Serializer):

@@ -143,18 +143,27 @@ class LoanRequestDetailSerializer(serializers.ModelSerializer):
 
     def get_memorandum_links(self, obj):
         request = self.context.get("request")
-        memorandums = obj.property.memorandums.filter(status="Published").values(
-            "id", "title"
-        )
+        # If the requester is the owning sponsor, show Draft and Published memorandums
+        if request and request.user and request.user.id == obj.sponsor_id:
+            memos = obj.property.memorandums.exclude(status="Failed").values(
+                "id", "title", "status"
+            )
+        else:
+            # For lenders, show Published memorandums
+            memos = obj.property.memorandums.filter(status="Published").values(
+                "id", "title", "status"
+            )
+
         if not request:
-            return list(memorandums)
+            return list(memos)
         return [
             {
                 "id": m["id"],
                 "title": m["title"],
+                "status": m["status"],
                 "url": request.build_absolute_uri(f"/api/v1/memorandums/{m['id']}/"),
             }
-            for m in memorandums
+            for m in memos
         ]
 
     def get_document_links(self, obj):
