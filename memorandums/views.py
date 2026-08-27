@@ -170,6 +170,7 @@ class GenerateMemorandumView(APIView):
     """
 
     permission_classes = [IsAuthenticated, IsSponsor]
+    throttle_scope = "ai_generation"
 
     @swagger_auto_schema(
         operation_summary="Generate a Memorandum for a property",
@@ -460,6 +461,7 @@ class MemorandumSectionRegenerateView(APIView):
 
     permission_classes = [IsAuthenticated, IsSponsor]
     parser_classes = [JSONParser, FormParser, MultiPartParser]
+    throttle_scope = "ai_generation"
 
     @swagger_auto_schema(
         operation_summary="AI regenerate a single text section",

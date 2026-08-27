@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from unfold.admin import ModelAdmin
+from unfold.decorators import display, action
+from django.utils.translation import gettext_lazy as _
+
 from accounts.models import (
     CustomUser,
     RoleModel,
@@ -12,34 +15,35 @@ from accounts.models import (
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin, ModelAdmin):
-
     list_display = [
         "email",
         "first_name",
         "last_name",
-        "active_role",
-        "is_verified",
-        "is_active",
+        "company_name",
+        "display_active_role",
+        "display_is_verified",
+        "display_is_active",
+        "date_joined",
     ]
-
     search_fields = [
         "email",
         "first_name",
         "last_name",
+        "company_name",
     ]
-
     list_filter = [
         "is_verified",
         "is_active",
         "active_role",
         "roles",
+        "date_joined",
     ]
-
     ordering = ["-date_joined"]
+    actions = ["action_verify_users", "action_activate_users"]
 
     fieldsets = (
         (
-            None,
+            _("Authentication"),
             {
                 "fields": (
                     "email",
@@ -48,7 +52,7 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
             },
         ),
         (
-            "Personal Information",
+            _("Personal Profile"),
             {
                 "fields": (
                     "first_name",
@@ -59,7 +63,7 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
             },
         ),
         (
-            "Roles",
+            _("Roles & Context"),
             {
                 "fields": (
                     "roles",
@@ -68,7 +72,7 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
             },
         ),
         (
-            "Company Information",
+            _("Company Information"),
             {
                 "fields": (
                     "company_name",
@@ -81,7 +85,7 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
             },
         ),
         (
-            "Permissions",
+            _("Permissions & Verification"),
             {
                 "fields": (
                     "is_active",
@@ -94,7 +98,7 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
             },
         ),
         (
-            "Important Dates",
+            _("Important Dates"),
             {
                 "fields": (
                     "last_login",
@@ -120,90 +124,111 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
         ),
     )
 
+    @display(
+        description=_("Active Role"),
+        label={
+            "Sponsor": "info",
+            "Lender": "success",
+        },
+    )
+    def display_active_role(self, obj):
+        return obj.active_role or "—"
+
+    @display(
+        description=_("Verified"),
+        boolean=True,
+    )
+    def display_is_verified(self, obj):
+        return obj.is_verified
+
+    @display(
+        description=_("Active Status"),
+        boolean=True,
+    )
+    def display_is_active(self, obj):
+        return obj.is_active
+
+    @action(description=_("Verify selected users"))
+    def action_verify_users(self, request, queryset):
+        count = queryset.update(is_verified=True)
+        self.message_user(request, f"{count} user(s) successfully marked as verified.")
+
+    @action(description=_("Activate selected users"))
+    def action_activate_users(self, request, queryset):
+        count = queryset.update(is_active=True)
+        self.message_user(request, f"{count} user(s) successfully activated.")
+
 
 @admin.register(RoleModel)
 class RoleAdmin(ModelAdmin):
-
-    list_display = [
-        "name",
-    ]
-
-    search_fields = [
-        "name",
-    ]
-
-    ordering = [
-        "name",
-    ]
+    list_display = ["id", "name"]
+    search_fields = ["name"]
+    ordering = ["name"]
 
 
 @admin.register(MediaFile)
 class MediaFileAdmin(ModelAdmin):
-
     list_display = [
         "id",
         "user",
-        "role",
+        "display_role",
         "file",
         "uploaded_at",
     ]
-
-    list_filter = [
-        "role",
-    ]
-
-    search_fields = [
-        "user__email",
-    ]
-
-    readonly_fields = [
-        "uploaded_at",
-    ]
-
+    list_filter = ["role", "uploaded_at"]
+    search_fields = ["user__email", "file"]
+    readonly_fields = ["uploaded_at"]
     ordering = ["-uploaded_at"]
+
+    @display(description=_("Role"), label=True)
+    def display_role(self, obj):
+        return obj.role.name if obj.role else "—"
 
 
 @admin.register(OTP)
 class OTPAdmin(ModelAdmin):
-
     list_display = [
+        "id",
         "email",
-        "otp_type",
-        "is_used",
+        "otp_code",
+        "display_otp_type",
+        "display_is_used",
         "created_at",
         "expires_at",
     ]
+    list_filter = ["otp_type", "is_used", "created_at"]
+    search_fields = ["email", "otp_code"]
+    readonly_fields = ["created_at", "expires_at"]
+    ordering = ["-created_at"]
 
-    list_filter = [
-        "otp_type",
-        "is_used",
-    ]
+    @display(
+        description=_("Type"),
+        label={
+            "SIGNUP": "info",
+            "PASSWORD_RESET": "warning",
+        },
+    )
+    def display_otp_type(self, obj):
+        return obj.otp_type
 
-    search_fields = [
-        "email",
-    ]
-
-    readonly_fields = [
-        "created_at",
-        "expires_at",
-    ]
+    @display(description=_("Used"), boolean=True)
+    def display_is_used(self, obj):
+        return obj.is_used
 
 
 @admin.register(PasswordResetSession)
 class PasswordResetSessionAdmin(ModelAdmin):
-
     list_display = [
+        "id",
         "email",
-        "otp_verified",
+        "display_otp_verified",
         "created_at",
         "expires_at",
     ]
+    search_fields = ["email"]
+    readonly_fields = ["created_at", "expires_at"]
+    ordering = ["-created_at"]
 
-    search_fields = [
-        "email",
-    ]
-
-    readonly_fields = [
-        "created_at",
-        "expires_at",
-    ]
+    @display(description=_("OTP Verified"), boolean=True)
+    def display_otp_verified(self, obj):
+        return obj.otp_verified

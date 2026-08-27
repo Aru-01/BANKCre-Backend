@@ -46,6 +46,7 @@ def get_error_schema(description="Error"):
 
 class SignupView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "auth"
 
     @swagger_auto_schema(
         operation_summary="User Signup",
@@ -84,6 +85,7 @@ class SignupView(APIView):
 
 class VerifySignupOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "otp"
 
     @swagger_auto_schema(
         operation_summary="Verify Signup OTP",
@@ -118,13 +120,17 @@ class VerifySignupOTPView(APIView):
         user.is_verified = True
         user.save(update_fields=["is_verified"])
         return Response(
-            {"message": "Email verified successfully. You can now log in."},
+            {
+                "message": "Email verified successfully. You can now log in.",
+                "data": {"email": user.email, "is_verified": True},
+            },
             status=status.HTTP_200_OK,
         )
 
 
 class ResendSignupOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "otp"
 
     @swagger_auto_schema(
         operation_summary="Resend Signup OTP",
@@ -165,6 +171,7 @@ class ResendSignupOTPView(APIView):
 
 class LoginView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "auth"
 
     @swagger_auto_schema(
         operation_summary="User Login",
@@ -260,6 +267,7 @@ class SwitchRoleView(APIView):
 
 class ForgotPasswordView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "otp"
 
     @swagger_auto_schema(
         operation_summary="Request Password Reset",
@@ -294,6 +302,7 @@ class ForgotPasswordView(APIView):
 
 class VerifyForgotPasswordOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "otp"
 
     @swagger_auto_schema(
         operation_summary="Verify Forgot Password OTP",
@@ -327,6 +336,7 @@ class VerifyForgotPasswordOTPView(APIView):
 
 class ResendForgotPasswordOTPView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "otp"
 
     @swagger_auto_schema(
         operation_summary="Resend Forgot Password OTP",
@@ -362,6 +372,7 @@ class ResendForgotPasswordOTPView(APIView):
 
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]
+    throttle_scope = "auth"
 
     @swagger_auto_schema(
         operation_summary="Reset Password",

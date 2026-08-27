@@ -2,6 +2,7 @@ from pathlib import Path
 from decouple import config
 import os
 from datetime import timedelta
+from django.urls import reverse_lazy
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -70,6 +71,7 @@ INSTALLED_APPS += [
 ]
 
 MIDDLEWARE = [
+    "django.middleware.gzip.GZipMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -200,13 +202,27 @@ CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = TIME_ZONE
+CELERY_RESULT_EXPIRES = 3600  # 1 hour auto-prune for Redis task cache
 
 
-# DRF & JWT Configuration
+# DRF, JWT & Rate Limiting (Throttling) Configuration
+# ==============================================================================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ),
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": "120/minute",
+        "user": "600/minute",
+        "otp": "5/minute",
+        "auth": "30/minute",
+        "ai_generation": "15/minute",
+    },
 }
 
 SIMPLE_JWT = {
@@ -278,4 +294,148 @@ _csrf_origins_env = config("CSRF_TRUSTED_ORIGINS", default=_default_csrf_origins
 CSRF_TRUSTED_ORIGINS = [
     origin.strip() for origin in _csrf_origins_env.split(",") if origin.strip()
 ]
+
+
+# Django Unfold Admin Configuration
+# ==============================================================================
+UNFOLD = {
+    "SITE_TITLE": "BANCre Admin Console",
+    "SITE_HEADER": "BANCre Management Console",
+    "SITE_URL": "/",
+    "SITE_SYMBOL": "real_estate_agent",
+    "SHOW_HISTORY": True,
+    "SHOW_VIEW_ON_SITE": True,
+    "COLORS": {
+        "primary": {
+            "50": "238 242 255",
+            "100": "224 231 255",
+            "200": "199 210 254",
+            "300": "165 180 252",
+            "400": "129 140 248",
+            "500": "99 102 241",
+            "600": "79 70 229",
+            "700": "67 56 202",
+            "800": "55 48 163",
+            "900": "49 46 129",
+            "950": "30 27 75",
+        },
+    },
+    "SIDEBAR": {
+        "show_search": True,
+        "show_all_applications": False,
+        "navigation": [
+            {
+                "title": "Authentication & Security",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "User Accounts",
+                        "icon": "group",
+                        "link": reverse_lazy("admin:accounts_customuser_changelist"),
+                    },
+                    {
+                        "title": "System Roles",
+                        "icon": "badge",
+                        "link": reverse_lazy("admin:accounts_rolemodel_changelist"),
+                    },
+                    {
+                        "title": "Media Files",
+                        "icon": "perm_media",
+                        "link": reverse_lazy("admin:accounts_mediafile_changelist"),
+                    },
+                    {
+                        "title": "OTP Verification Logs",
+                        "icon": "pin",
+                        "link": reverse_lazy("admin:accounts_otp_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Real Estate Assets",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Properties",
+                        "icon": "apartment",
+                        "link": reverse_lazy("admin:properties_property_changelist"),
+                    },
+                    {
+                        "title": "Property Documents",
+                        "icon": "folder",
+                        "link": reverse_lazy("admin:properties_propertyfile_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "Commercial Financing",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Loan Requests",
+                        "icon": "request_quote",
+                        "link": reverse_lazy("admin:loan_loanrequest_changelist"),
+                    },
+                    {
+                        "title": "Loan Quotes",
+                        "icon": "payments",
+                        "link": reverse_lazy("admin:loan_loanquote_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "AI Offering Memorandums",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Memorandums",
+                        "icon": "description",
+                        "link": reverse_lazy("admin:memorandums_memorandum_changelist"),
+                    },
+                    {
+                        "title": "Memorandum Sections",
+                        "icon": "view_list",
+                        "link": reverse_lazy("admin:memorandums_memorandumsection_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "AI Assistant",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Conversations",
+                        "icon": "forum",
+                        "link": reverse_lazy("admin:chatbot_conversation_changelist"),
+                    },
+                    {
+                        "title": "Messages",
+                        "icon": "chat",
+                        "link": reverse_lazy("admin:chatbot_message_changelist"),
+                    },
+                ],
+            },
+            {
+                "title": "System Alerts & Tasks",
+                "separator": True,
+                "items": [
+                    {
+                        "title": "Notifications",
+                        "icon": "notifications",
+                        "link": reverse_lazy("admin:notifications_notification_changelist"),
+                    },
+                    {
+                        "title": "Email Preferences",
+                        "icon": "tune",
+                        "link": reverse_lazy("admin:notifications_notificationpreference_changelist"),
+                    },
+                    {
+                        "title": "Celery Tasks",
+                        "icon": "task_alt",
+                        "link": reverse_lazy("admin:django_celery_results_taskresult_changelist"),
+                    },
+                ],
+            },
+        ],
+    },
+}
 

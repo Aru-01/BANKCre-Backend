@@ -16,23 +16,35 @@ def send_templated_email(
     recipient_email: str,
     plain_fallback: str = "",
 ) -> None:
-    """Send an HTML-templated email with a plaintext alternative safely."""
+    """Send an HTML-templated email asynchronously using Celery with synchronous fallback."""
     try:
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "support@bancre.com")
+        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "BANCre <support@bancre.com>")
         html_content = render_to_string(template_name, context)
         text_content = plain_fallback or f"{subject}\n\nPlease view this email in an HTML-compatible email client."
 
-        email_message = EmailMultiAlternatives(
-            subject=subject,
-            body=text_content,
-            from_email=from_email,
-            to=[recipient_email],
-        )
-        email_message.attach_alternative(html_content, "text/html")
-        email_message.send(fail_silently=True)
+        try:
+            from notifications.tasks import send_email_async_task
+
+            send_email_async_task.delay(
+                subject=subject,
+                body=text_content,
+                from_email=from_email,
+                recipient_list=[recipient_email],
+                html_content=html_content,
+            )
+        except Exception:
+            # Fallback to direct send if Celery worker is unreachable
+            email_message = EmailMultiAlternatives(
+                subject=subject,
+                body=text_content,
+                from_email=from_email,
+                to=[recipient_email],
+            )
+            email_message.attach_alternative(html_content, "text/html")
+            email_message.send(fail_silently=True)
     except Exception as e:
         logger.error(
-            "Failed to send templated email [%s] to %s: %s",
+            "Failed to dispatch templated email [%s] to %s: %s",
             template_name,
             recipient_email,
             str(e),
