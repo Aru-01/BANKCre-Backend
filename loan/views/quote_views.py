@@ -80,11 +80,7 @@ class LoanQuoteListCreateView(APIView):
         },
     )
     def post(self, request, pk):
-        is_lender = (
-            request.user.roles.filter(name=Role.LENDER).exists()
-            or getattr(request.user, "active_role", None) == Role.LENDER
-        )
-        if not is_lender:
+        if not request.user.has_role(Role.LENDER):
             return Response(
                 {"message": "Only Lender accounts can submit quotes."},
                 status=status.HTTP_403_FORBIDDEN,

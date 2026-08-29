@@ -10,14 +10,7 @@ class IsLender(BasePermission):
             return False
         if request.user.is_superuser:
             return True
-        if getattr(request.user, "active_role", None) == Role.LENDER:
-            return True
-
-        if not hasattr(request.user, "_is_lender_cache"):
-            request.user._is_lender_cache = request.user.roles.filter(
-                name=Role.LENDER
-            ).exists()
-        return request.user._is_lender_cache
+        return request.user.has_role(Role.LENDER)
 
 
 class IsSponsor(BasePermission):
@@ -28,14 +21,7 @@ class IsSponsor(BasePermission):
             return False
         if request.user.is_superuser:
             return True
-        if getattr(request.user, "active_role", None) == Role.SPONSOR:
-            return True
-
-        if not hasattr(request.user, "_is_sponsor_cache"):
-            request.user._is_sponsor_cache = request.user.roles.filter(
-                name=Role.SPONSOR
-            ).exists()
-        return request.user._is_sponsor_cache
+        return request.user.has_role(Role.SPONSOR)
 
 
 class IsSponsorOrLender(BasePermission):
@@ -46,11 +32,4 @@ class IsSponsorOrLender(BasePermission):
             return False
         if request.user.is_superuser:
             return True
-        if getattr(request.user, "active_role", None) in (Role.SPONSOR, Role.LENDER):
-            return True
-
-        if not hasattr(request.user, "_is_sponsor_or_lender_cache"):
-            request.user._is_sponsor_or_lender_cache = request.user.roles.filter(
-                name__in=[Role.SPONSOR, Role.LENDER]
-            ).exists()
-        return request.user._is_sponsor_or_lender_cache
+        return request.user.has_role(Role.SPONSOR) or request.user.has_role(Role.LENDER)

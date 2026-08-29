@@ -92,10 +92,7 @@ class LoanRequestListCreateView(APIView):
         },
     )
     def post(self, request):
-        if not (
-            request.user.roles.filter(name=Role.SPONSOR).exists()
-            or getattr(request.user, "active_role", None) == Role.SPONSOR
-        ):
+        if not request.user.has_role(Role.SPONSOR):
             return Response(
                 {"message": "Only Sponsor accounts can create loan requests."},
                 status=status.HTTP_403_FORBIDDEN,
@@ -162,10 +159,7 @@ class LoanRequestDetailView(APIView):
         loan_request = self._get_request(pk)
 
         is_owner = loan_request.sponsor_id == request.user.id
-        is_lender = (
-            request.user.roles.filter(name=Role.LENDER).exists()
-            or getattr(request.user, "active_role", None) == Role.LENDER
-        )
+        is_lender = request.user.has_role(Role.LENDER)
 
         if not is_owner:
             if (
