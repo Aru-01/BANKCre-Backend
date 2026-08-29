@@ -8,6 +8,7 @@ from notifications.models import Notification, NotificationPreference
 
 @admin.register(Notification)
 class NotificationAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "recipient",
@@ -25,6 +26,7 @@ class NotificationAdmin(ModelAdmin):
         "message",
     ]
     raw_id_fields = ["recipient"]
+    list_select_related = ["recipient"]
     date_hierarchy = "created_at"
     actions = ["action_mark_as_read", "action_mark_as_unread"]
     ordering = ["-created_at"]
@@ -61,6 +63,7 @@ class NotificationAdmin(ModelAdmin):
 
 @admin.register(NotificationPreference)
 class NotificationPreferenceAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "user",
@@ -74,6 +77,7 @@ class NotificationPreferenceAdmin(ModelAdmin):
     ]
     search_fields = ["user__email", "user__first_name", "user__last_name"]
     raw_id_fields = ["user"]
+    list_select_related = ["user"]
     readonly_fields = ["updated_at"]
     ordering = ["-updated_at"]
 

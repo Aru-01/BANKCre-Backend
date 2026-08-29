@@ -15,6 +15,7 @@ from accounts.models import (
 
 @admin.register(CustomUser)
 class CustomUserAdmin(UserAdmin, ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "email",
         "first_name",
@@ -161,6 +162,7 @@ class CustomUserAdmin(UserAdmin, ModelAdmin):
 
 @admin.register(RoleModel)
 class RoleAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = ["id", "name"]
     search_fields = ["name"]
     ordering = ["name"]
@@ -168,6 +170,7 @@ class RoleAdmin(ModelAdmin):
 
 @admin.register(MediaFile)
 class MediaFileAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "user",
@@ -178,6 +181,7 @@ class MediaFileAdmin(ModelAdmin):
     list_filter = ["role", "uploaded_at"]
     search_fields = ["user__email", "file"]
     readonly_fields = ["uploaded_at"]
+    list_select_related = ["user", "role"]
     ordering = ["-uploaded_at"]
 
     @display(description=_("Role"), label=True)
@@ -187,6 +191,7 @@ class MediaFileAdmin(ModelAdmin):
 
 @admin.register(OTP)
 class OTPAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "email",
@@ -218,6 +223,7 @@ class OTPAdmin(ModelAdmin):
 
 @admin.register(PasswordResetSession)
 class PasswordResetSessionAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "email",

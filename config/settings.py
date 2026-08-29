@@ -239,6 +239,7 @@ CORS_ALLOW_ALL_ORIGINS = config("CORS_ALLOW_ALL_ORIGINS", default=False, cast=bo
 # Specific allowed origins (loaded from .env as comma-separated strings)
 _default_cors_origins = (
     "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:3001,http://127.0.0.1:3001,"
     "http://localhost:5173,http://127.0.0.1:5173,"
     "http://localhost:8000,http://127.0.0.1:8000"
 )
@@ -259,16 +260,10 @@ CORS_ALLOWED_ORIGIN_REGEXES = [
 
 CORS_ALLOW_CREDENTIALS = True
 
-CORS_ALLOW_HEADERS = [
-    "accept",
-    "accept-encoding",
-    "authorization",
-    "content-type",
-    "dnt",
-    "origin",
-    "user-agent",
-    "x-csrftoken",
-    "x-requested-with",
+from corsheaders.defaults import default_headers
+
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    "ngrok-skip-browser-warning",
 ]
 
 CORS_ALLOW_METHODS = [
@@ -285,6 +280,7 @@ CORS_ALLOW_METHODS = [
 # =========================
 _default_csrf_origins = (
     "http://localhost:3000,http://127.0.0.1:3000,"
+    "http://localhost:3001,http://127.0.0.1:3001,"
     "http://localhost:5173,http://127.0.0.1:5173,"
     "http://localhost:8000,http://127.0.0.1:8000,"
     "https://*.ngrok-free.app,https://*.ngrok-free.dev,https://*.ngrok.app,https://*.ngrok.dev,https://*.ngrok.io,https://*.loca.lt,"

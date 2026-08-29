@@ -24,6 +24,7 @@ class LoanQuoteInline(TabularInline):
 
 @admin.register(LoanRequest)
 class LoanRequestAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "property",
@@ -44,6 +45,7 @@ class LoanRequestAdmin(ModelAdmin):
     ]
     readonly_fields = ["created_at", "updated_at"]
     raw_id_fields = ["property", "sponsor", "sponsor_role"]
+    list_select_related = ["property", "sponsor", "sponsor_role"]
     date_hierarchy = "created_at"
     inlines = [LoanQuoteInline]
     actions = ["action_mark_active", "action_mark_closed"]
@@ -81,6 +83,7 @@ class LoanRequestAdmin(ModelAdmin):
 
 @admin.register(LoanQuote)
 class LoanQuoteAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "loan_request",
@@ -101,6 +104,7 @@ class LoanQuoteAdmin(ModelAdmin):
         "loan_request__property__property_name",
     ]
     raw_id_fields = ["loan_request", "lender", "lender_role"]
+    list_select_related = ["loan_request__property", "lender", "lender_role"]
     readonly_fields = ["submitted_at", "updated_at"]
     date_hierarchy = "submitted_at"
     ordering = ["-submitted_at"]

@@ -56,6 +56,7 @@ class PropertyChatMessageInline(TabularInline):
 
 @admin.register(Property)
 class PropertyAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "property_name",
@@ -95,6 +96,7 @@ class PropertyAdmin(ModelAdmin):
 
 @admin.register(PropertyFile)
 class PropertyFileAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "property",
@@ -125,6 +127,7 @@ class PropertyFileAdmin(ModelAdmin):
 
 @admin.register(PropertyFileChunk)
 class PropertyFileChunkAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = ["id", "file", "chunk_index"]
     search_fields = ["file__file_name", "file__property__property_name"]
     readonly_fields = ["file", "chunk_index", "chunk_text"]
@@ -137,6 +140,7 @@ class PropertyFileChunkAdmin(ModelAdmin):
 
 @admin.register(PropertyChatSession)
 class PropertyChatSessionAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = ["id", "property", "user", "title", "updated_at"]
     search_fields = ["property__property_name", "user__email", "title"]
     readonly_fields = ["created_at", "updated_at"]
@@ -146,6 +150,7 @@ class PropertyChatSessionAdmin(ModelAdmin):
 
 @admin.register(PropertyChatMessage)
 class PropertyChatMessageAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = ["id", "session", "display_role", "created_at"]
     list_filter = ["role", "created_at"]
     readonly_fields = ["created_at"]

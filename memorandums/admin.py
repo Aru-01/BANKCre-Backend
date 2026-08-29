@@ -22,6 +22,7 @@ class MemorandumSectionInline(TabularInline):
 
 @admin.register(Memorandum)
 class MemorandumAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "title",
@@ -34,6 +35,7 @@ class MemorandumAdmin(ModelAdmin):
     list_filter = ["status", "mode", "created_at"]
     search_fields = ["title", "property__property_name", "sponsor__email"]
     readonly_fields = ["created_at", "updated_at"]
+    list_select_related = ["property", "sponsor"]
     inlines = [MemorandumSectionInline]
     actions = ["action_publish_memorandums"]
     ordering = ["-created_at"]
@@ -68,6 +70,7 @@ class MemorandumAdmin(ModelAdmin):
 
 @admin.register(MemorandumSection)
 class MemorandumSectionAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = [
         "id",
         "memorandum",
@@ -79,6 +82,7 @@ class MemorandumSectionAdmin(ModelAdmin):
     list_filter = ["section_type", "section_key", "updated_at"]
     search_fields = ["memorandum__title", "section_key"]
     readonly_fields = ["updated_at"]
+    list_select_related = ["memorandum__property"]
     ordering = ["memorandum", "order"]
 
     @display(

@@ -14,17 +14,21 @@ class MessageInline(TabularInline):
 
 @admin.register(Conversation)
 class ConversationAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = ["id", "user", "title", "created_at", "updated_at"]
     search_fields = ["user__email", "title"]
     list_filter = ["created_at", "updated_at"]
+    list_select_related = ["user"]
     inlines = [MessageInline]
 
 
 @admin.register(Message)
 class MessageAdmin(ModelAdmin):
+    show_full_result_count = False
     list_display = ["id", "conversation", "role", "short_content", "created_at"]
     search_fields = ["content", "conversation__user__email", "conversation__title"]
     list_filter = ["role", "created_at"]
+    list_select_related = ["conversation__user"]
 
     def short_content(self, obj):
         return obj.content[:60] if obj.content else ""
