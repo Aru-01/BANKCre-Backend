@@ -1,12 +1,83 @@
+import re
 from rest_framework import serializers
 from memorandums.models import Memorandum, MemorandumSection
 from memorandums.ai_engine.extractors import SECTION_LABELS
+
+
+def parse_content_to_table(content: str, section_key: str = "") -> dict:
+    """
+    Intelligently converts text/markdown content into tabular data
+    {"columns": [...], "rows": [[...], ...]} so that the frontend can
+    render every section as a table seamlessly.
+    """
+    if not content:
+        return {"columns": ["Item", "Details"], "rows": []}
+
+    # 1. Key-Value pairs (e.g. property_information)
+    if section_key == "property_information" or (
+        content.count(": ") >= 3 and "#" not in content
+    ):
+        rows = []
+        for line in content.split("\n"):
+            line = line.strip()
+            if not line:
+                continue
+            if ":" in line:
+                parts = line.split(":", 1)
+                rows.append([parts[0].strip(), parts[1].strip()])
+            else:
+                rows.append(["Info", line])
+        return {"columns": ["Attribute", "Value"], "rows": rows}
+
+    # 2. Markdown Headings (## or ###)
+    heading_pattern = re.compile(r"^(#{1,3})\s+(.+)$", re.MULTILINE)
+    matches = list(heading_pattern.finditer(content))
+    if len(matches) >= 2:
+        rows = []
+        for i in range(len(matches)):
+            start_pos = matches[i].end()
+            end_pos = matches[i + 1].start() if i + 1 < len(matches) else len(content)
+            title = matches[i].group(2).strip()
+            body = content[start_pos:end_pos].strip()
+            body = re.sub(r"^-{3,}$", "", body, flags=re.MULTILINE).strip()
+            if body:
+                rows.append([title, body])
+        if rows:
+            return {"columns": ["Topic", "Details"], "rows": rows}
+
+    # 3. Bullet points (- or *)
+    bullets = re.findall(r"^\s*[-*]\s+(.+)$", content, re.MULTILINE)
+    if bullets:
+        rows = []
+        for b in bullets:
+            b = b.strip()
+            if "**" in b and ":" in b:
+                m = re.match(r"^\*{0,2}(.*?)\*{0,2}:\s*(.*)$", b)
+                if m:
+                    rows.append(
+                        [m.group(1).replace("*", "").strip(), m.group(2).strip()]
+                    )
+                else:
+                    rows.append(["Highlight", b.replace("*", "")])
+            else:
+                rows.append(["Highlight", b.replace("*", "")])
+        return {"columns": ["Feature", "Description"], "rows": rows}
+
+    # 4. Fallback: split by paragraphs
+    paragraphs = [p.strip() for p in content.split("\n\n") if p.strip()]
+    rows = []
+    for i, p in enumerate(paragraphs, 1):
+        clean_p = re.sub(r"^[#-]+\s*", "", p).strip()
+        rows.append([f"Section {i}", clean_p])
+    return {"columns": ["Item", "Details"], "rows": rows}
 
 
 class MemorandumSectionSerializer(serializers.ModelSerializer):
     label = serializers.SerializerMethodField()
     is_regeneratable = serializers.SerializerMethodField()
     image = serializers.ImageField(use_url=True, required=False, allow_null=True)
+    table_data = serializers.SerializerMethodField()
+    section_type = serializers.SerializerMethodField()
 
     class Meta:
         model = MemorandumSection
@@ -37,6 +108,19 @@ class MemorandumSectionSerializer(serializers.ModelSerializer):
 
     def get_is_regeneratable(self, obj):
         return obj.is_regeneratable
+
+    def get_section_type(self, obj):
+        # Always return 'table' format to satisfy frontend tabular rendering requirement
+        return "table"
+
+    def get_table_data(self, obj):
+        if (
+            obj.table_data
+            and isinstance(obj.table_data, dict)
+            and obj.table_data.get("columns")
+        ):
+            return obj.table_data
+        return parse_content_to_table(obj.content, obj.section_key)
 
 
 class MemorandumListSerializer(serializers.ModelSerializer):
