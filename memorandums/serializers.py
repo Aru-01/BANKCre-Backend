@@ -74,6 +74,25 @@ class MemorandumDetailSerializer(serializers.ModelSerializer):
     property_name = serializers.CharField(
         source="property.property_name", read_only=True
     )
+    property_address = serializers.CharField(
+        source="property.property_address", read_only=True
+    )
+    property_type = serializers.CharField(
+        source="property.property_type", read_only=True
+    )
+    occupancy = serializers.DecimalField(
+        source="property.occupancy", max_digits=5, decimal_places=2, read_only=True
+    )
+    year_built = serializers.IntegerField(
+        source="property.year_built", read_only=True
+    )
+    rentable_area = serializers.DecimalField(
+        source="property.rentable_area", max_digits=12, decimal_places=2, read_only=True
+    )
+    number_of_units = serializers.IntegerField(
+        source="property.number_of_units", read_only=True
+    )
+    property_images = serializers.SerializerMethodField()
     sections = MemorandumSectionSerializer(many=True, read_only=True)
 
     class Meta:
@@ -82,6 +101,13 @@ class MemorandumDetailSerializer(serializers.ModelSerializer):
             "id",
             "property",
             "property_name",
+            "property_address",
+            "property_type",
+            "occupancy",
+            "year_built",
+            "rentable_area",
+            "number_of_units",
+            "property_images",
             "title",
             "status",
             "mode",
@@ -89,14 +115,17 @@ class MemorandumDetailSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
         ]
-        read_only_fields = [
-            "id",
-            "property",
-            "property_name",
-            "sections",
-            "created_at",
-            "updated_at",
-        ]
+        read_only_fields = fields
+
+    def get_property_images(self, obj):
+        request = self.context.get("request")
+        images = obj.property.files.filter(category="image")
+        urls = []
+        for img in images:
+            if img.file:
+                url = request.build_absolute_uri(img.file.url) if request else img.file.url
+                urls.append(url)
+        return urls
 
 
 class MemorandumUpdateSerializer(serializers.ModelSerializer):

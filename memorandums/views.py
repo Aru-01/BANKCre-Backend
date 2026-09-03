@@ -301,7 +301,9 @@ class MemorandumDetailView(APIView):
     )
     def get(self, request, pk):
         memorandum = get_object_or_404(
-            Memorandum.objects.select_related("property").prefetch_related("sections"),
+            Memorandum.objects.select_related("property").prefetch_related(
+                "sections", "property__files"
+            ),
             pk=pk,
         )
         serializer = MemorandumDetailSerializer(

@@ -18,22 +18,6 @@ AUTH_USER_MODEL = "accounts.CustomUser"
 
 _allowed_hosts_env = config("ALLOWED_HOSTS", default="*")
 ALLOWED_HOSTS = [host.strip() for host in _allowed_hosts_env.split(",") if host.strip()]
-if "*" in ALLOWED_HOSTS or DEBUG:
-    default_dev_hosts = [
-        "testserver",
-        "localhost",
-        "127.0.0.1",
-        "0.0.0.0",
-        ".ngrok-free.app",
-        ".ngrok-free.dev",
-        ".ngrok.app",
-        ".ngrok.dev",
-        ".ngrok.io",
-        ".loca.lt",
-    ]
-    for h in default_dev_hosts:
-        if h not in ALLOWED_HOSTS:
-            ALLOWED_HOSTS.append(h)
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
@@ -74,6 +58,7 @@ MIDDLEWARE = [
     "django.middleware.gzip.GZipMiddleware",
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -159,11 +144,20 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
+# Static files (CSS, JavaScript, Images) with WhiteNoise compression & caching
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 # Media files (uploads)
 MEDIA_URL = "/media/"
