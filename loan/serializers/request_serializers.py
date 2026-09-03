@@ -136,39 +136,36 @@ class LoanRequestDetailSerializer(serializers.ModelSerializer):
 
     def get_property_image_url(self, obj):
         request = self.context.get("request")
-        image_file = obj.property.files.filter(category="image").first()
-        if image_file and image_file.file and request:
-            return request.build_absolute_uri(image_file.file.url)
+        image_files = [f for f in obj.property.files.all() if f.category == "image"]
+        if image_files and image_files[0].file and request:
+            return request.build_absolute_uri(image_files[0].file.url)
         return None
 
     def get_memorandum_links(self, obj):
         request = self.context.get("request")
+        all_memos = list(obj.property.memorandums.all())
         # If the requester is the owning sponsor, show Draft and Published memorandums
         if request and request.user and request.user.id == obj.sponsor_id:
-            memos = obj.property.memorandums.exclude(status="Failed").values(
-                "id", "title", "status"
-            )
+            memos = [m for m in all_memos if m.status != "Failed"]
         else:
             # For lenders, show Published memorandums
-            memos = obj.property.memorandums.filter(status="Published").values(
-                "id", "title", "status"
-            )
+            memos = [m for m in all_memos if m.status == "Published"]
 
         if not request:
-            return list(memos)
+            return [{"id": m.id, "title": m.title, "status": m.status} for m in memos]
         return [
             {
-                "id": m["id"],
-                "title": m["title"],
-                "status": m["status"],
-                "url": request.build_absolute_uri(f"/api/v1/memorandums/{m['id']}/"),
+                "id": m.id,
+                "title": m.title,
+                "status": m.status,
+                "url": request.build_absolute_uri(f"/api/v1/memorandums/{m.id}/"),
             }
             for m in memos
         ]
 
     def get_document_links(self, obj):
         request = self.context.get("request")
-        docs = obj.property.files.filter(category="document")
+        docs = [f for f in obj.property.files.all() if f.category == "document"]
         if not request:
             return []
         return [

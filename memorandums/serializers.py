@@ -119,7 +119,8 @@ class MemorandumDetailSerializer(serializers.ModelSerializer):
 
     def get_property_images(self, obj):
         request = self.context.get("request")
-        images = obj.property.files.filter(category="image")
+        # Utilize in-memory prefetched cache to avoid duplicate SQL queries
+        images = [f for f in obj.property.files.all() if f.category == "image"]
         urls = []
         for img in images:
             if img.file:
