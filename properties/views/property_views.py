@@ -121,16 +121,27 @@ class PropertyViewSet(ModelViewSet):
         if not photo_urls:
             photo_urls = request.data.getlist("photo_urls[]")
 
-        # Clean up in case it's a single string with commas or a JSON array string
-        if len(photo_urls) == 1:
-            val = photo_urls[0].strip()
-            if val.startswith('[') and val.endswith(']'):
+        # Clean up in case it's a JSON array string, bracketed string, or comma-separated
+        parsed_urls = []
+        for item in photo_urls:
+            item_str = str(item).strip()
+            if item_str.startswith("[") and item_str.endswith("]"):
                 try:
-                    photo_urls = json.loads(val)
+                    loaded = json.loads(item_str)
+                    if isinstance(loaded, list):
+                        parsed_urls.extend([str(u).strip() for u in loaded if u])
+                        continue
                 except Exception:
-                    pass
-            elif "," in val:
-                photo_urls = [url.strip() for url in val.split(",")]
+                    item_str = item_str[1:-1].strip()
+
+            if "," in item_str:
+                parsed_urls.extend(
+                    [u.strip().strip("'\"") for u in item_str.split(",") if u.strip()]
+                )
+            elif item_str:
+                parsed_urls.append(item_str.strip("'\""))
+
+        photo_urls = [u for u in parsed_urls if u.startswith("http")]
 
         if photo_urls:
             from properties.tasks import download_map_images_task
